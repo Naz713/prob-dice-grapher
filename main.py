@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-default_color_order = ['b', 'g', 'r', 'c', 'y', 'm', 'orange', 'purple', 'brown']
+default_color_order = ['b', 'g', 'r', 'c', 'y', 'm', 'purple', 'brown', 'orange']
 
 
 def dice_roll_string_to_array_lambda(dice_string="3d8 +4d12"):
@@ -91,16 +91,25 @@ def plot_graphs(dice_configs):
         dice_shape, lambda_shape, lambda_instr = dice_roll_string_to_array_lambda(d_c)
         funt = create_lambda(lambda_shape, lambda_instr)
         d_arr, p_arr = dice_prob(dice_shape, funt)
+
         # divided by 100 to transform percentage to probability
-        mean = sum([i * j / 100 for (i, j) in zip(d_arr, p_arr)])
-        mean_label = "MEAN: ~%s" % round(mean, 1)
+        mean = sum([i * p / 100 for (i, p) in zip(d_arr, p_arr)])
+        aad = sum([abs(mean - i) * p / 100 for (i, p) in zip(d_arr, p_arr)])
+        aad_label_plus = "MEAN + AAD: ~%s" % round(mean + aad, 1)
+        aad_label_mins = "MEAN - AAD: ~%s" % round(mean - aad, 1)
+
         plt.plot(d_arr, p_arr, label=d_c, color=default_color_order[i])
-        plt.axvline(x=mean, color=default_color_order[i], label=mean_label)
-        print(mean_label)
-    plt.ylabel("Probability")
-    plt.xlabel("Dice Result")
-    plt.legend()
-    plt.show()
+        label = "MEAN: ~%s AAD: ~%s" % (round(mean, 1), round(aad, 1))
+        print(label)
+
+        plt.axvline(x=mean, color=default_color_order[i], label=label)
+        plt.axvline(x=mean+aad, color=default_color_order[i], label=aad_label_plus)
+        plt.axvline(x=mean-aad, color=default_color_order[i], label=aad_label_mins)
+
+        plt.ylabel("Probability")
+        plt.xlabel("Dice Result")
+        plt.legend()
+        plt.show()
 
 
 if __name__ == '__main__':
