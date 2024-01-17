@@ -86,6 +86,10 @@ def dice_prob(dice_shape=None, count_f=None):
 
 
 def plot_graphs(dice_configs):
+    plt.ylabel("Probability")
+    plt.xlabel("Dice Result")
+
+    lines = []
     for i, d_c in enumerate(dice_configs):
         print("Dice Config: %s" % d_c)
         dice_shape, lambda_shape, lambda_instr = dice_roll_string_to_array_lambda(d_c)
@@ -103,15 +107,29 @@ def plot_graphs(dice_configs):
 
         print(label)
 
-        plt.plot(d_arr, p_arr, color=default_color_order[i], label=label)
-        plt.axvline(x=mean, color=default_color_order[i], label=mean_label)
-        plt.axvline(x=mean+aad, color=default_color_order[i], label=aad_label_plus)
-        plt.axvline(x=mean-aad, color=default_color_order[i], label=aad_label_mins)
+        lines.append(plt.plot(d_arr, p_arr, color=default_color_order[i], label=label)[0])
+        lines.append(plt.axvline(x=mean-aad, color=default_color_order[i], label=aad_label_mins))
+        lines.append(plt.axvline(x=mean, color=default_color_order[i], label=mean_label))
+        lines.append(plt.axvline(x=mean+aad, color=default_color_order[i], label=aad_label_plus))
 
-        plt.ylabel("Probability")
-        plt.xlabel("Dice Result")
-        plt.legend()
-        plt.show()
+    graphs = {}
+    legends = plt.legend().get_lines()
+    for line, legend in zip(lines, legends):
+        legend.set_picker(True)
+        legend.set_pickradius(7)
+        graphs[legend] = line
+
+    def on_pick(event):
+        legend = event.artist
+        isVisible = legend.get_visible()
+
+        graphs[legend].set_visible(not isVisible)
+        legend.set_visible(not isVisible)
+
+        plt.draw()
+
+    plt.connect('pick_event', on_pick)
+    plt.show()
 
 
 if __name__ == '__main__':
