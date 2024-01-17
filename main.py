@@ -95,14 +95,16 @@ def plot_graphs(dice_configs):
         # divided by 100 to transform percentage to probability
         mean = sum([i * p / 100 for (i, p) in zip(d_arr, p_arr)])
         aad = sum([abs(mean - i) * p / 100 for (i, p) in zip(d_arr, p_arr)])
+
+        label = "%s (%s, %s)" % (d_c, round(mean, 1), round(aad, 1))
+        mean_label = "MEAN: ~%s" % round(mean, 1)
         aad_label_plus = "MEAN + AAD: ~%s" % round(mean + aad, 1)
         aad_label_mins = "MEAN - AAD: ~%s" % round(mean - aad, 1)
 
-        plt.plot(d_arr, p_arr, label=d_c, color=default_color_order[i])
-        label = "MEAN: ~%s AAD: ~%s" % (round(mean, 1), round(aad, 1))
         print(label)
 
-        plt.axvline(x=mean, color=default_color_order[i], label=label)
+        plt.plot(d_arr, p_arr, color=default_color_order[i], label=label)
+        plt.axvline(x=mean, color=default_color_order[i], label=mean_label)
         plt.axvline(x=mean+aad, color=default_color_order[i], label=aad_label_plus)
         plt.axvline(x=mean-aad, color=default_color_order[i], label=aad_label_mins)
 
